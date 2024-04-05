@@ -1,12 +1,11 @@
 // Интерфейс данных о товаре
 
-export interface IProduct {
-    id: string;
+export interface ICard {
     category: string;
     title: string;
-    about?: string;
     image: string;
     price: number;
+    text: string;
 }
 
 
@@ -49,22 +48,35 @@ export interface IConfirmation {
 //Все что ниже нужно добавить в документацию
 
 // Интерфейс карточки 
-export interface ICard extends IProduct {
-
+export interface IProduct extends ICard {
+    id: string;
+    about: string;
 }
 
 export interface IWebLarekAPI {
     getCards: () => Promise<ICard[]>;
-    getLotItem: (id: string) => Promise<ICard>;
+    getCardItem: (id: string) => Promise<ICard>;
     orderResult: (order: IOrder) => Promise<IOrderResult>;
 }
 
 // Получение ответа от сервера, в ответе будет две графы
 export interface IOrder extends IContacts, IDeliveryForm {
-    item: string[];
+    items: string[];
     total: number;
 }
 
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
+
+
 export interface IOrderResult {
     id: string;
+}
+
+export interface IAppState {
+    catalog: IProduct[];
+    basket: string[];
+    preview: string | null;
+    order: IOrder | null;
+    total: string | number;
+    loading: boolean;
 }

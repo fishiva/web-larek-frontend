@@ -29,15 +29,15 @@ export abstract class Component<T> {
         }
     }
 
-    // Скрыть
-    protected setHidden(element: HTMLElement) {
-        element.style.display = 'none';
-    }
+    // // Скрыть
+    // protected setHidden(element: HTMLElement) {
+    //     element.style.display = 'none';
+    // }
 
-    // Показать
-    protected setVisible(element: HTMLElement) {
-        element.style.removeProperty('display');
-    }
+    // // Показать
+    // protected setVisible(element: HTMLElement) {
+    //     element.style.removeProperty('display');
+    // }
 
     // Установить изображение с алтернативным текстом
     protected setImage(element: HTMLImageElement, src: string, alt?: string) {
@@ -48,6 +48,13 @@ export abstract class Component<T> {
             }
         }
     }
+
+    protected setCategory(element:HTMLElement, value:string) {
+        if(element) {
+            
+        }
+    }
+    
 
     // Вернуть корневой DOM-элемент
     render(data?: Partial<T>): HTMLElement {

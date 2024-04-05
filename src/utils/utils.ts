@@ -70,7 +70,7 @@ export function getObjectProperties(obj: object, filter?: (name: string, prop: P
 }
 
 /**
- * Устанавливает dataset атрибуты элемента
+ * Устанавливает datdayjsaset атрибуты элемента
  */
 export function setElementData<T extends Record<string, unknown> | object>(el: HTMLElement, data: T) {
     for (const key in data) {
