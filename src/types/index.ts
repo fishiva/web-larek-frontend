@@ -1,6 +1,6 @@
 // Интерфейс данных о товаре
 
-interface IProduct {
+export interface IProduct {
     id: string;
     category: string;
     title: string;
@@ -12,7 +12,7 @@ interface IProduct {
 
 // Интерфейс отображения страницы
 
-interface IPage {
+export interface IPage {
     counter: number;
     catalog: HTMLElement[];
     locked: boolean;
@@ -20,29 +20,51 @@ interface IPage {
 
 // Интерфейс отображения корзины
 
-interface IBasket {
+export interface IBasket {
     items: HTMLElement[];
     cost: number;
 } 
 
 // Интерфейс отображения формы доставки
 
-interface IDeliveryForm {
+export interface IDeliveryForm {
     address: string;
     payment: string;
 }
 
 // Интерфейс отображения формы заполнения данных
 
-interface IContacts {
+export interface IContacts {
     email: string;
     phone: string;
 }
 
 // Интерфейс отображения подтверждения покупки
 
-interface IConfirmation {
+export interface IConfirmation {
     cost: number | null;
 }
 
-// Интерфейс 
+
+//Все что ниже нужно добавить в документацию
+
+// Интерфейс карточки 
+export interface ICard extends IProduct {
+
+}
+
+export interface IWebLarekAPI {
+    getCards: () => Promise<ICard[]>;
+    getLotItem: (id: string) => Promise<ICard>;
+    orderResult: (order: IOrder) => Promise<IOrderResult>;
+}
+
+// Получение ответа от сервера, в ответе будет две графы
+export interface IOrder extends IContacts, IDeliveryForm {
+    item: string[];
+    total: number;
+}
+
+export interface IOrderResult {
+    id: string;
+}
