@@ -6,83 +6,18 @@ import {FormErrors, IAppState,  ICard, IOrder, IProduct} from "../types";
 // };
 
 export class CardItem extends Model<IProduct> {
-    about: string;
+    description: string;
     category: string;
-    // description: string;
     id: string;
     image: string;
     title: string;
-    // datetime: string;
-    // history: number[];
-    // minPrice: number;
     price: number;
-    // status: LotStatus;
-
-    // protected myLastBid: number = 0;
-
-//     clearBid() {
-//         this.myLastBid = 0;
-//     }
-
-//     placeBid(price: number): void {
-//         this.price = price;
-//         this.history = [...this.history.slice(1), price];
-//         this.myLastBid = price;
-
-//         if (price > (this.minPrice * 10)) {
-//             this.status = 'closed';
-//         }
-//         this.emitChanges('auction:changed', { id: this.id, price });
-//     }
-
-//     get isMyBid(): boolean {
-//         return this.myLastBid === this.price;
-//     }
-
-//     get isParticipate(): boolean {
-//         return this.myLastBid !== 0;
-//     }
-
-//     get statusLabel(): string {
-//         switch (this.status) {
-//             case "active":
-//                 return `Открыто до ${dayjs(this.datetime).format('D MMMM [в] HH:mm')}`
-//             case "closed":
-//                 return `Закрыто ${dayjs(this.datetime).format('D MMMM [в] HH:mm')}`
-//             case "wait":
-//                 return `Откроется ${dayjs(this.datetime).format('D MMMM [в] HH:mm')}`
-//             default:
-//                 return this.status;
-//         }
-//     }
-
-//     get timeStatus(): string {
-//         if (this.status === 'closed') return 'Аукцион завершен';
-//         else return dayjs
-//             .duration(dayjs(this.datetime).valueOf() - Date.now())
-//             .format('D[д] H[ч] m[ мин] s[ сек]');
-//     }
-
-//     get auctionStatus(): string {
-//         switch (this.status) {
-//             case 'closed':
-//                 return `Продано за ${formatNumber(this.price)}₽`;
-//             case 'wait':
-//                 return 'До начала аукциона';
-//             case 'active':
-//                 return 'До закрытия лота';
-//             default:
-//                 return '';
-//         }
-//     }
-
-//     get nextBid(): number {
-//         return Math.floor(this.price * 1.1);
-//     }
+    counter: number;
 }
 
+
 export class AppState extends Model<IAppState> {
-    basket: IProduct[];
+    basket: CardItem[] = [];
     catalog: CardItem[];
     loading: boolean;
     order: IOrder = {
@@ -93,20 +28,8 @@ export class AppState extends Model<IAppState> {
         address: "",
         payment: ""
     };
-    // preview: string | null;
+    preview: string | null;
     formErrors: FormErrors = {};
-
-    // toggleOrderedLot(id: string, isIncluded: boolean) {
-    //     if (isIncluded) {
-    //         this.order.items = _.uniq([...this.order.items, id]);
-    //     } else {
-    //         this.order.items = _.without(this.order.items, id);
-    //     }
-    // }
-
-    clearBasket() {
-
-    }
 
     getTotal() {
         return this.order.items.reduce((a, c) => a + this.catalog.find(it => it.id === c).price, 0)
@@ -117,29 +40,45 @@ export class AppState extends Model<IAppState> {
         this.emitChanges('items:changed', { catalog: this.catalog });
     }
 
-    // setPreview(item: CardItem) {
-    //     this.preview = item.id;
-    //     this.emitChanges('preview:changed', item);
-    // }
+    setPreview(item: CardItem) {
+        this.preview = item.id;
+        this.emitChanges('preview:changed', item);
+    }
 
-    // getActiveLots(): LotItem[] {
-    //     return this.catalog
-    //         .filter(item => item.status === 'active' && item.isParticipate);
-    // }
 
-    // getClosedLots(): LotItem[] {
-    //     return this.catalog
-    //         .filter(item => item.status === 'closed' && item.isMyBid)
-    // }
+    getClosedLots(): string[] {
+        return this.order.items;
+    }
 
-    // setOrderField(field: keyof IOrderForm, value: string) {
-    //     this.order[field] = value;
+    addToOrder(value: CardItem) {
+        this.order.items.push(value.id);
+    }
 
-    //     if (this.validateOrder()) {
-    //         this.events.emit('order:ready', this.order);
-    //     }
-    // }
+    deleteFromOrder(value: CardItem) {
+        let a = this.order.items.indexOf(value.id)
+        if ( a != -1) {
+            this.order.items.splice(a,1);
+        }
+    }
 
+    clearbasket() {
+        this.basket.splice(0, this.basket.length);
+        this.order.items.splice(0,this.order.items.length);
+    }
+
+    addToBasket(value: CardItem) {
+        this.basket.push(value);
+    }
+
+    deleteFromBasket(value: CardItem) {
+        let a = this.basket.indexOf(value)
+        if ( a != -1) {
+            this.basket.splice(a,1);
+        }
+    }
+
+
+    
     validateOrder() {
         const errors: typeof this.formErrors = {};
         if (!this.order.email) {
@@ -153,3 +92,4 @@ export class AppState extends Model<IAppState> {
         return Object.keys(errors).length === 0;
     }
 }
+

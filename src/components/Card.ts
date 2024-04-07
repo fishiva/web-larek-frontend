@@ -2,15 +2,7 @@ import { Component } from "./base/Components";
 import { ICard } from "../types";
 import { ensureElement } from "../utils/utils";
 
-// export interface ICard {
-//     id: string;
-//     category: string;
-//     title: string;
-//     image: string;
-//     price: number;
-// }
-
-interface ICardActions {
+export interface ICardActions {
     onClick: (event: MouseEvent) => void;
 }
 
@@ -19,6 +11,8 @@ export class Card<T> extends Component<ICard> {
     protected _title: HTMLElement;
     protected _image: HTMLImageElement;
     protected _price: HTMLElement;
+    protected _button?: HTMLElement;
+    protected _blockName?: string;
 
     protected _dict = <Record<string,string>>  {
         "софт-скил": "soft",
@@ -28,18 +22,24 @@ export class Card<T> extends Component<ICard> {
         "хард-скил":"hard"
     }
 
-    constructor(container: HTMLElement, actions?: ICardActions) {
+    constructor(blockName: string, container: HTMLElement, actions?: ICardActions) {
         super(container);
 
-        this._category = ensureElement<HTMLElement>('.card__category',container)
-        this._title = ensureElement<HTMLElement>('.card__title',container);
-        this._image = ensureElement<HTMLImageElement>('.card__image',container);
-        this._price = ensureElement<HTMLElement>('.card__price',container);
+        this._category = ensureElement<HTMLElement>(`.${blockName}__category`,container);
+        this._price = ensureElement<HTMLElement>(`.${blockName}__price`,container);
+        this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
+        this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
+        this._button = container.querySelector(`.${blockName}__button`);
 
-        if(actions?.onClick) {
-            container.addEventListener('click', actions.onClick);
-        } 
+        if (actions?.onClick) {
+            if (this._button) {
+                this._button.addEventListener('click', actions.onClick);
+            } else {
+                container.addEventListener('click', actions.onClick);
+            }
+        }
     }
+
 
     set category(value:string) {
         this.setText(this._category,value);
@@ -59,6 +59,7 @@ export class Card<T> extends Component<ICard> {
             this.setText(this._price,value + ' синапсов');
         }
         else {
+            this.setDisabled(this._button,true);
             this.setText(this._price, 'Бесценно');
         }
     }

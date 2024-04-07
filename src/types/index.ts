@@ -1,13 +1,18 @@
-// Интерфейс данных о товаре
+// Интерфейс карточки
 
 export interface ICard {
     category: string;
     title: string;
     image: string;
     price: number;
-    text: string;
+    description: string;
 }
 
+// Интерфейс попапа карточки
+export interface ICardPopup {
+    about: string;
+    button: HTMLButtonElement;
+}
 
 // Интерфейс отображения страницы
 
@@ -19,9 +24,11 @@ export interface IPage {
 
 // Интерфейс отображения корзины
 
-export interface IBasket {
-    items: HTMLElement[];
+export interface IBasketPopup {
+    index: number;
+    title: string;
     cost: number;
+    button: HTMLElement;   
 } 
 
 // Интерфейс отображения формы доставки
@@ -47,10 +54,14 @@ export interface IConfirmation {
 
 //Все что ниже нужно добавить в документацию
 
-// Интерфейс карточки 
-export interface IProduct extends ICard {
+// Интерфейс данных о товаре
+export interface IProduct{
     id: string;
-    about: string;
+    description: string;
+    image: string;
+    title: string;
+    category: string;
+    price: number;
 }
 
 export interface IWebLarekAPI {
