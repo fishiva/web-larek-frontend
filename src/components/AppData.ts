@@ -45,11 +45,6 @@ export class AppState extends Model<IAppState> {
         this.emitChanges('preview:changed', item);
     }
 
-
-    getClosedLots(): string[] {
-        return this.order.items;
-    }
-
     addToOrder(value: CardItem) {
         this.order.items.push(value.id);
     }
@@ -77,9 +72,17 @@ export class AppState extends Model<IAppState> {
         }
     }
 
+    validateDelivery() {
+        const errors: typeof this.formErrors = {};
+        if (!this.order.address) {
+            errors.email = 'Введите адресс';
+        }
+        this.formErrors = errors;
+        this.events.emit('formErrors:change', this.formErrors);
+        return Object.keys(errors).length === 0;
+    }
 
-    
-    validateOrder() {
+    validateContacts() {
         const errors: typeof this.formErrors = {};
         if (!this.order.email) {
             errors.email = 'Необходимо указать email';
@@ -90,6 +93,22 @@ export class AppState extends Model<IAppState> {
         this.formErrors = errors;
         this.events.emit('formErrors:change', this.formErrors);
         return Object.keys(errors).length === 0;
+    }
+
+    setDeliveryField<T extends keyof IOrder>(field: T, value: IOrder[T]) {
+        this.order[field] = value;
+
+        if (this.validateDelivery()) {
+            this.events.emit('order:ready', this.order);
+        }
+    }
+
+    setContactsField<T extends keyof IOrder>(field: T, value: IOrder[T]) {
+        this.order[field] = value;
+
+        if (this.validateContacts()) {
+            this.events.emit('order:ready', this.order);
+        }
     }
 }
 

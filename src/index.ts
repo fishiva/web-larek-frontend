@@ -7,11 +7,14 @@ import { Page } from './components/Page';
 import { AppState, CardItem } from './components/AppData';
 import { Card } from './components/Card';
 import { cloneTemplate, ensureElement } from './utils/utils';
-import { IProduct } from './types';
+import { IOrder, IProduct } from './types';
 import { CardPopup } from './components/CardPopup';
 import { Modal } from './components/common/Modal';
 import { Basket } from './components/common/Basket';
 import { BasketPopup } from './components/BasketPopup';
+import { DeliveryForm } from './components/DeliveryForm';
+import { Contacts } from './components/Contacts';
+import { Success } from './components/common/Success';
 
 
 
@@ -20,6 +23,9 @@ const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
 const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
 const events = new EventEmitter();
 const api = new WebLarekApi(CDN_URL, API_URL);
@@ -31,6 +37,11 @@ const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 const basket = new Basket(cloneTemplate<HTMLTemplateElement>(basketTemplate), events);
+
+const order = new DeliveryForm(cloneTemplate(orderTemplate), events);
+
+const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
+
 
 events.on('items:changed',() => {
     page.catalog = appData.catalog.map(item => {
@@ -107,6 +118,77 @@ events.on('card:delete', (item: CardItem) => {
     events.emit('basket:open');
 })
 
+// 
+events.on('order:open', () => {
+    modal.render({
+        content: order.render({
+            address: "",
+            valid: false,
+            errors: []
+        })
+    });
+});
+
+// Изменение способа оплаты 
+events.on('payment:change',(item: HTMLElement) => {
+    appData.order.payment = order.paymentSelection;
+    console.log(appData.order.payment);
+})
+
+events.on('order:submit', () => {
+    modal.render({
+        content: contacts.render({
+            email: "",
+            phone: "",
+            valid: false,
+            errors: []
+        })
+    });
+});
+
+
+// Изменилось состояние валидации формы
+events.on('formErrors:change', (errors: Partial<IOrder>) => {
+    const { email, phone, address, payment} = errors;
+    contacts.valid = !email && !phone;
+    contacts.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
+    order.valid = !address && !payment;
+    order.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
+});
+
+// Изменилось одно из полей
+events.on(/^order\..*:change/, (data: { field: keyof IOrder, value: string }) => {
+    appData.setDeliveryField(data.field, data.value);
+});
+
+// Изменилось одно из полей
+events.on(/^contacts\..*:change/, (data: { field: keyof IOrder, value: string }) => {
+    appData.setContactsField(data.field, data.value);
+});
+
+
+events.on('contacts:submit', () => {
+    appData.order.total = appData.getTotal();
+
+    api.orderResult(appData.order)
+    .then(res => {
+        const success = new Success(cloneTemplate(successTemplate), {
+            onClick: () => {
+                appData.clearbasket();
+                modal.close()
+                page.counter = appData.basket.length;
+            }
+        })
+        modal.render({
+            content:success.render({
+                total: appData.order.total
+            })
+        })
+    })
+    .catch(err => {
+        console.error(err);
+    });
+})
 
 
 // Блокируем прокрутку страницы если открыта модалка

@@ -40,14 +40,6 @@ export class Basket extends Component<IBasketView> {
         }
     }
 
-    set selected(items: string[]) {
-        if (items.length) {
-            this.setDisabled(this.button, false);
-        } else {
-            this.setDisabled(this.button, true);
-        }
-    }
-
     set total(total: number) {
         this.setText(this._total, `${total} синапсов`);
     }

@@ -51,9 +51,6 @@ export interface IConfirmation {
     cost: number | null;
 }
 
-
-//Все что ниже нужно добавить в документацию
-
 // Интерфейс данных о товаре
 export interface IProduct{
     id: string;
@@ -74,6 +71,7 @@ export interface IWebLarekAPI {
 export interface IOrder extends IContacts, IDeliveryForm {
     items: string[];
     total: number;
+
 }
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
