@@ -123,14 +123,16 @@ events.on('order:open', () => {
     modal.render({
         content: order.render({
             address: "",
+            payment: "online",
             valid: false,
             errors: []
         })
     });
+    console.log(appData.order);
 });
 
 // Изменение способа оплаты 
-events.on('payment:change',(item: HTMLElement) => {
+events.on('payment:change',() => {
     appData.order.payment = order.paymentSelection;
     console.log(appData.order.payment);
 })
@@ -150,11 +152,12 @@ events.on('order:submit', () => {
 // Изменилось состояние валидации формы
 events.on('formErrors:change', (errors: Partial<IOrder>) => {
     const { email, phone, address, payment} = errors;
-    contacts.valid = !email && !phone;
-    contacts.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
     order.valid = !address && !payment;
-    order.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
+    order.errors = Object.values({address, payment}).filter(Boolean).join('; ');
+    contacts.valid = !email && !phone;
+    contacts.errors = Object.values({phone, email}).filter(Boolean).join('; ');
 });
+
 
 // Изменилось одно из полей
 events.on(/^order\..*:change/, (data: { field: keyof IOrder, value: string }) => {
@@ -175,7 +178,7 @@ events.on('contacts:submit', () => {
         const success = new Success(cloneTemplate(successTemplate), {
             onClick: () => {
                 appData.clearbasket();
-                modal.close()
+                modal.close();
                 page.counter = appData.basket.length;
             }
         })

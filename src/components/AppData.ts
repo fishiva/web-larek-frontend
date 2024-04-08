@@ -26,7 +26,7 @@ export class AppState extends Model<IAppState> {
         items: [],
         total: 0,
         address: "",
-        payment: ""
+        payment: "online"
     };
     preview: string | null;
     formErrors: FormErrors = {};
@@ -59,6 +59,7 @@ export class AppState extends Model<IAppState> {
     clearbasket() {
         this.basket.splice(0, this.basket.length);
         this.order.items.splice(0,this.order.items.length);
+        this.order.payment = null;
     }
 
     addToBasket(value: CardItem) {
@@ -75,7 +76,10 @@ export class AppState extends Model<IAppState> {
     validateDelivery() {
         const errors: typeof this.formErrors = {};
         if (!this.order.address) {
-            errors.email = 'Введите адресс';
+            errors.address = 'Введите адресс';
+        }
+        if (!this.order.payment) {
+            errors.payment = 'Выберите способ оплаты';
         }
         this.formErrors = errors;
         this.events.emit('formErrors:change', this.formErrors);

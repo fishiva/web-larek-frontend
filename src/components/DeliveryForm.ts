@@ -1,12 +1,11 @@
 import {Form} from "./common/Form";
 import {IDeliveryForm} from "../types";
 import {EventEmitter, IEvents} from "./base/events";
-import {ensureElement} from "../utils/utils";
+import {ensureAllElements, ensureElement} from "../utils/utils";
 
 export class DeliveryForm extends Form<IDeliveryForm> {
     protected _buttonOnline: HTMLElement;
     protected _buttonCash: HTMLElement;
-
 
     constructor(container: HTMLFormElement, events: IEvents) {
         super(container, events);
@@ -31,6 +30,16 @@ export class DeliveryForm extends Form<IDeliveryForm> {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
     }
 
+    set payment(value: string){
+        if(value === 'online'){
+            this._buttonOnline.classList.add('button_alt-active');
+            this._buttonCash.classList.remove('button_alt-active');
+            
+        } else {
+            this._buttonOnline.classList.remove('button_alt-active');
+            this._buttonCash.classList.add('button_alt-active');
+        }
+    }
 
     get paymentSelection () {
         if(this._buttonCash.classList.contains('button_alt-active')){
